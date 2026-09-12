@@ -1,0 +1,24 @@
+   name: CI Pipeline
+
+   on:
+     push:
+       branches: [main]
+     pull_request:
+       branches: [main]
+
+   jobs:
+     build-and-test:
+       runs-on: ubuntu-latest
+       steps:
+         - name: Checkout code
+           uses: actions/checkout@v4
+
+         - name: Build Docker image
+           run: docker build -t devops-demo:ci .
+
+         - name: Run container and test
+           run: |
+             docker run -d -p 3000:3000 --name test-container devops-demo:ci
+             sleep 2
+             curl --fail http://localhost:3000
+             docker stop test-container
