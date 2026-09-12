@@ -31,7 +31,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set lowercase repo owner
+        run: echo "OWNER_LC=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
       - name: Tag and push image
         run: |
-          docker tag devops-demo:ci ghcr.io/${{ github.repository_owner }}/docker-ci-demo:latest
-          docker push ghcr.io/${{ github.repository_owner }}/docker-ci-demo:latest
+          docker tag devops-demo:ci ghcr.io/${{ env.OWNER_LC }}/docker-ci-demo:latest
+          docker push ghcr.io/${{ env.OWNER_LC }}/docker-ci-demo:latest
