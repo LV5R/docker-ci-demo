@@ -1,24 +1,37 @@
-   name: CI Pipeline
+name: CI Pipeline
 
-   on:
-     push:
-       branches: [main]
-     pull_request:
-       branches: [main]
+on:
+  push:
+    branches: [main]
 
-   jobs:
-     build-and-test:
-       runs-on: ubuntu-latest
-       steps:
-         - name: Checkout code
-           uses: actions/checkout@v4
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-         - name: Build Docker image
-           run: docker build -t devops-demo:ci .
+      - name: Build Docker image
+        run: docker build -t devops-demo:ci .
 
-         - name: Run container and test
-           run: |
-             docker run -d -p 3000:3000 --name test-container devops-demo:ci
-             sleep 2
-             curl --fail http://localhost:3000
-             docker stop test-container
+      - name: Run container and test
+        run: |
+          docker run -d -p 3000:3000 --name test-container devops-demo:ci
+          sleep 2
+          curl --fail http://localhost:3000
+          docker stop test-container
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag and push image
+        run: |
+          docker tag devops-demo:ci ghcr.io/${{ github.repository_owner }}/docker-ci-demo:latest
+          docker push ghcr.io/${{ github.repository_owner }}/docker-ci-demo:latest
