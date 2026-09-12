@@ -3,6 +3,6 @@
      res.writeHead(200, {'Content-Type': 'text/plain'});
      res.end('Hello from inside a container!\n');
    });
-   server.listen(4000, () => console.log('Server running on port 4000'));
+   server.listen(3000, () => console.log('Server running on port 4000'));
 
 
